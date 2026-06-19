@@ -2,6 +2,7 @@ package ru.practicum.shareit.user.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.exception.ConflictException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.user.dto.UserDto;
@@ -12,18 +13,21 @@ import ru.practicum.shareit.user.repository.UserRepository;
 import java.util.List;
 
 @Service
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
 
     @Override
+    @Transactional
     public UserDto create(UserDto userDto) {
         checkEmailIsFree(userDto.getEmail(), null);
-        return userMapper.mapToDto(userRepository.create(userMapper.map(userDto)));
+        return userMapper.mapToDto(userRepository.save(userMapper.map(userDto)));
     }
 
     @Override
+    @Transactional
     public UserDto update(Long userId, UserDto userDto) {
         User user = getUser(userId);
 
@@ -35,7 +39,7 @@ public class UserServiceImpl implements UserService {
             user.setEmail(userDto.getEmail());
         }
 
-        return userMapper.mapToDto(userRepository.update(user));
+        return userMapper.mapToDto(userRepository.save(user));
     }
 
     @Override
@@ -62,7 +66,7 @@ public class UserServiceImpl implements UserService {
     }
 
     private void checkEmailIsFree(String email, Long currentUserId) {
-        userRepository.findByEmail(email)
+        userRepository.findUserByEmail(email)
                 .filter(user -> !user.getId().equals(currentUserId))
                 .ifPresent(user -> {
                     throw new ConflictException("Email already exists: " + email);

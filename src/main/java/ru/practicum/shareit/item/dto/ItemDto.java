@@ -5,8 +5,6 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 import lombok.experimental.Accessors;
-import ru.practicum.shareit.request.model.ItemRequest;
-import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.validation.ValidationGroups.Update;
 import ru.practicum.shareit.validation.ValidationGroups.Create;
 
@@ -26,7 +24,7 @@ public class ItemDto {
     @NotNull(groups = Create.class)
     Boolean available;
 
-    User owner;
+    Long ownerId;
 
-    ItemRequest request;
+    Long requestId;
 }

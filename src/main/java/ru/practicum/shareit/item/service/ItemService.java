@@ -12,7 +12,7 @@ public interface ItemService {
 
     ItemDto getById(Long userId, Long itemId);
 
-    List<ItemDto> getByOwner(Long userId);
+    List<ItemDto> getAllByOwnerId(Long userId);
 
     List<ItemDto> search(String text);
 }

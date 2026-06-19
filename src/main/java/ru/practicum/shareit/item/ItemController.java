@@ -27,8 +27,10 @@ public class ItemController {
     private final ItemService itemService;
 
     @PostMapping
-    public ItemDto create(@RequestHeader(USER_ID_HEADER) Long userId,
-                          @Validated(Create.class) @RequestBody ItemDto itemDto) {
+    public ItemDto create(
+            @RequestHeader(USER_ID_HEADER) Long userId,
+            @Validated(Create.class) @RequestBody ItemDto itemDto
+    ) {
         return itemService.create(userId, itemDto);
     }
 
@@ -51,7 +53,7 @@ public class ItemController {
 
     @GetMapping
     public List<ItemDto> getByOwner(@RequestHeader(USER_ID_HEADER) Long userId) {
-        return itemService.getByOwner(userId);
+        return itemService.getAllByOwnerId(userId);
     }
 
     @GetMapping("/search")

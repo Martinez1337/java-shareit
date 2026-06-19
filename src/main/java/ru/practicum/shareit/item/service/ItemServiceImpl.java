@@ -2,6 +2,7 @@ package ru.practicum.shareit.item.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemMapper;
@@ -10,9 +11,11 @@ import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class ItemServiceImpl implements ItemService {
     private final ItemRepository itemRepository;
@@ -20,14 +23,16 @@ public class ItemServiceImpl implements ItemService {
     private final ItemMapper itemMapper;
 
     @Override
+    @Transactional
     public ItemDto create(Long userId, ItemDto itemDto) {
         User owner = getUser(userId);
         Item item = itemMapper.map(itemDto);
         item.setOwner(owner);
-        return itemMapper.mapToDto(itemRepository.create(item));
+        return itemMapper.mapToDto(itemRepository.save(item));
     }
 
     @Override
+    @Transactional
     public ItemDto update(Long userId, Long itemId, ItemDto itemDto) {
         getUser(userId);
         Item item = getItem(itemId);
@@ -45,7 +50,7 @@ public class ItemServiceImpl implements ItemService {
             item.setAvailable(itemDto.getAvailable());
         }
 
-        return itemMapper.mapToDto(itemRepository.update(item));
+        return itemMapper.mapToDto(itemRepository.save(item));
     }
 
     @Override
@@ -55,9 +60,9 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemDto> getByOwner(Long userId) {
+    public List<ItemDto> getAllByOwnerId(Long userId) {
         getUser(userId);
-        return itemRepository.findAllByOwnerId(userId)
+        return itemRepository.findAllByOwner_Id(userId)
                 .stream()
                 .map(itemMapper::mapToDto)
                 .toList();
@@ -65,7 +70,11 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public List<ItemDto> search(String text) {
-        return itemRepository.search(text)
+        if (text == null || text.isBlank()) {
+            return new ArrayList<>();
+        }
+
+        return itemRepository.searchAvailableItems(text)
                 .stream()
                 .map(itemMapper::mapToDto)
                 .toList();
