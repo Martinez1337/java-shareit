@@ -12,7 +12,9 @@ import java.util.Date;
 @Entity
 @Table(name = "requests")
 @Accessors(chain = true)
-@Getter @Setter @ToString
+@Getter
+@Setter
+@ToString
 public class ItemRequest {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;

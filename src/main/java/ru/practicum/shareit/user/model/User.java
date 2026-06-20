@@ -9,7 +9,9 @@ import lombok.experimental.Accessors;
 @Entity
 @Table(name = "users")
 @Accessors(chain = true)
-@Getter @Setter @ToString
+@Getter
+@Setter
+@ToString
 public class User {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;

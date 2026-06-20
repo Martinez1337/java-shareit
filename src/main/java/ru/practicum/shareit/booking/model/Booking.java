@@ -13,7 +13,9 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "bookings")
 @Accessors(chain = true)
-@Getter @Setter @ToString
+@Getter
+@Setter
+@ToString
 public class Booking {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
