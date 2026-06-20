@@ -1,4 +1,4 @@
-package ru.practicum.shareit.request.dto;
+package ru.practicum.shareit.request.model;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
@@ -8,7 +8,7 @@ import java.util.Date;
 
 @Data
 @Accessors(chain = true)
-public class ItemRequestDto {
+public class ItemRequest {
     Long id;
 
     String description;

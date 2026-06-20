@@ -1,8 +1,7 @@
-package ru.practicum.shareit.booking.dto;
+package ru.practicum.shareit.booking.model;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
-import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.model.User;
 
@@ -10,7 +9,7 @@ import java.util.Date;
 
 @Data
 @Accessors(chain = true)
-public class BookingDto {
+public class Booking {
     Long id;
 
     Date start;

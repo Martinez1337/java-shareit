@@ -1,18 +1,16 @@
-package ru.practicum.shareit.item.dto;
+package ru.practicum.shareit.user.dto;
 
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 import lombok.experimental.Accessors;
-import ru.practicum.shareit.request.model.ItemRequest;
-import ru.practicum.shareit.user.model.User;
-import ru.practicum.shareit.validation.ValidationGroups.Update;
 import ru.practicum.shareit.validation.ValidationGroups.Create;
+import ru.practicum.shareit.validation.ValidationGroups.Update;
 
 @Data
 @Accessors(chain = true)
-public class ItemDto {
+public class UserDto {
     Long id;
 
     @NotBlank(groups = Create.class)
@@ -20,13 +18,7 @@ public class ItemDto {
     String name;
 
     @NotBlank(groups = Create.class)
+    @Email(groups = {Create.class, Update.class})
     @Pattern(regexp = ".*\\S.*", groups = Update.class)
-    String description;
-
-    @NotNull(groups = Create.class)
-    Boolean available;
-
-    User owner;
-
-    ItemRequest request;
+    String email;
 }
