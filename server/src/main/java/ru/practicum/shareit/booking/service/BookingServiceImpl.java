@@ -18,6 +18,7 @@ import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Locale;
 
@@ -25,6 +26,8 @@ import java.util.Locale;
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class BookingServiceImpl implements BookingService {
+    private static final ZoneId APP_ZONE = ZoneId.of(System.getenv().getOrDefault("TZ", "Europe/Moscow"));
+
     private final BookingRepository bookingRepository;
     private final ItemRepository itemRepository;
     private final UserRepository userRepository;
@@ -85,7 +88,7 @@ public class BookingServiceImpl implements BookingService {
     public List<BookingDto> getAllByUserId(Long userId, String state) {
         getUser(userId);
         BookingState bookingState = parseState(state);
-        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime now = now();
 
         List<Booking> bookings = switch (bookingState) {
             case ALL -> bookingRepository.findAllByBooker_IdOrderByStartDesc(userId);
@@ -109,7 +112,7 @@ public class BookingServiceImpl implements BookingService {
     public List<BookingDto> getAllByOwnerId(Long userId, String state) {
         getUser(userId);
         BookingState bookingState = parseState(state);
-        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime now = now();
 
         List<Booking> bookings = switch (bookingState) {
             case ALL -> bookingRepository.findAllByOwnerId(userId);
@@ -162,5 +165,9 @@ public class BookingServiceImpl implements BookingService {
         if (!bookingCreateDto.getEnd().isAfter(bookingCreateDto.getStart())) {
             throw new BadRequestException("Booking end date must be after start date");
         }
+    }
+
+    private LocalDateTime now() {
+        return LocalDateTime.now(APP_ZONE);
     }
 }

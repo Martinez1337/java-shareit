@@ -24,6 +24,7 @@ import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -35,6 +36,8 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class ItemServiceImpl implements ItemService {
+    private static final ZoneId APP_ZONE = ZoneId.of(System.getenv().getOrDefault("TZ", "Europe/Moscow"));
+
     private final ItemRepository itemRepository;
     private final BookingRepository bookingRepository;
     private final CommentRepository commentRepository;
@@ -85,7 +88,7 @@ public class ItemServiceImpl implements ItemService {
         itemDto.setComments(mapToCommentDtos(commentRepository.findAllByItemId(itemId)));
         if (item.getOwner().getId().equals(userId)) {
             List<Booking> bookings = getBookingsByItemId(List.of(itemId)).getOrDefault(itemId, List.of());
-            setBookingDates(itemDto, bookings, LocalDateTime.now());
+            setBookingDates(itemDto, bookings, now());
         }
         return itemDto;
     }
@@ -99,7 +102,7 @@ public class ItemServiceImpl implements ItemService {
                 .toList();
         Map<Long, List<Booking>> bookingsByItemId = getBookingsByItemId(itemIds);
         Map<Long, List<Comment>> commentsByItemId = getCommentsByItemId(itemIds);
-        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime now = now();
 
         return items.stream()
                 .map(item -> mapToOwnerDto(item, bookingsByItemId, commentsByItemId, now))
@@ -123,7 +126,7 @@ public class ItemServiceImpl implements ItemService {
     public CommentDto addComment(Long userId, Long itemId, CommentCreateDto commentCreateDto) {
         User author = getUser(userId);
         Item item = getItem(itemId);
-        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime now = now();
 
         boolean userBookedItem = bookingRepository.existsByItem_IdAndBooker_IdAndStatusAndEndBefore(
                 itemId,
@@ -223,5 +226,9 @@ public class ItemServiceImpl implements ItemService {
         return comments.stream()
                 .map(commentMapper::mapToDto)
                 .toList();
+    }
+
+    private LocalDateTime now() {
+        return LocalDateTime.now(APP_ZONE);
     }
 }
