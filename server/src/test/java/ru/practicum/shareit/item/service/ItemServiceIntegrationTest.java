@@ -23,7 +23,6 @@ import ru.practicum.shareit.user.repository.UserRepository;
 import ru.practicum.shareit.user.service.UserService;
 
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -32,8 +31,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 @SpringBootTest
 @Transactional
 class ItemServiceIntegrationTest {
-    private static final ZoneId APP_ZONE = ZoneId.of(System.getenv().getOrDefault("TZ", "Europe/Moscow"));
-
     @Autowired
     private ItemService itemService;
 
@@ -94,7 +91,7 @@ class ItemServiceIntegrationTest {
                 .setText("Too early")))
                 .isInstanceOf(BadRequestException.class);
 
-        createApprovedBooking(item.getId(), booker.getId(), LocalDateTime.now(APP_ZONE).minusDays(2));
+        createApprovedBooking(item.getId(), booker.getId(), LocalDateTime.now().minusDays(2));
 
         CommentDto comment = itemService.addComment(booker.getId(), item.getId(), new CommentCreateDto()
                 .setText("Works well"));
@@ -107,6 +104,22 @@ class ItemServiceIntegrationTest {
     }
 
     @Test
+    void addCommentShouldRejectApprovedBookingThatHasNotEnded() {
+        UserDto owner = createUser("owner-current-comment@example.com");
+        UserDto booker = createUser("booker-current-comment@example.com");
+        ItemDto item = itemService.create(owner.getId(), new ItemDto()
+                .setName("Tripod")
+                .setDescription("Camera tripod")
+                .setAvailable(true));
+
+        createApprovedBooking(item.getId(), booker.getId(), LocalDateTime.now().minusMinutes(30));
+
+        assertThatThrownBy(() -> itemService.addComment(booker.getId(), item.getId(), new CommentCreateDto()
+                .setText("Still using it")))
+                .isInstanceOf(BadRequestException.class);
+    }
+
+    @Test
     void getAllByOwnerShouldIncludeLastNextBookingsAndComments() {
         UserDto owner = createUser("owner-dashboard@example.com");
         UserDto booker = createUser("booker-dashboard@example.com");
@@ -114,7 +127,7 @@ class ItemServiceIntegrationTest {
                 .setName("Bike")
                 .setDescription("City bike")
                 .setAvailable(true));
-        LocalDateTime now = LocalDateTime.now(APP_ZONE);
+        LocalDateTime now = LocalDateTime.now();
         LocalDateTime pastStart = now.minusDays(3);
         LocalDateTime futureStart = now.plusDays(1);
         createApprovedBooking(item.getId(), booker.getId(), pastStart);

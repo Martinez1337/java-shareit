@@ -9,7 +9,10 @@ import java.util.TimeZone;
 public class ShareItServer {
 
 	public static void main(String[] args) {
-		TimeZone.setDefault(TimeZone.getTimeZone(System.getenv().getOrDefault("TZ", "Europe/Moscow")));
+		String timeZone = System.getenv("TZ");
+		if (timeZone != null && !timeZone.isBlank()) {
+			TimeZone.setDefault(TimeZone.getTimeZone(timeZone));
+		}
 		SpringApplication.run(ShareItServer.class, args);
 	}
 

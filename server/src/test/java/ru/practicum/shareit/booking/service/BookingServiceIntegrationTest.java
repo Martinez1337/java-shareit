@@ -15,7 +15,6 @@ import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.service.UserService;
 
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -23,8 +22,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 @SpringBootTest
 @Transactional
 class BookingServiceIntegrationTest {
-    private static final ZoneId APP_ZONE = ZoneId.of(System.getenv().getOrDefault("TZ", "Europe/Moscow"));
-
     @Autowired
     private BookingService bookingService;
 
@@ -39,7 +36,7 @@ class BookingServiceIntegrationTest {
         UserDto owner = createUser("owner-booking@example.com");
         UserDto booker = createUser("booker-booking@example.com");
         ItemDto item = createItem(owner.getId(), "Drill");
-        LocalDateTime start = LocalDateTime.now(APP_ZONE).plusHours(1);
+        LocalDateTime start = LocalDateTime.now().plusHours(1);
         LocalDateTime end = start.plusHours(2);
 
         BookingDto created = bookingService.create(booker.getId(), new BookingCreateDto()
@@ -62,7 +59,7 @@ class BookingServiceIntegrationTest {
     void createShouldRejectOwnerBookingOwnItemAndInvalidDates() {
         UserDto owner = createUser("owner-invalid-booking@example.com");
         ItemDto item = createItem(owner.getId(), "Saw");
-        LocalDateTime start = LocalDateTime.now(APP_ZONE).plusHours(2);
+        LocalDateTime start = LocalDateTime.now().plusHours(2);
 
         assertThatThrownBy(() -> bookingService.create(owner.getId(), new BookingCreateDto()
                 .setItemId(item.getId())
@@ -85,8 +82,8 @@ class BookingServiceIntegrationTest {
         ItemDto item = createItem(owner.getId(), "Tent");
         BookingDto waiting = bookingService.create(booker.getId(), new BookingCreateDto()
                 .setItemId(item.getId())
-                .setStart(LocalDateTime.now(APP_ZONE).plusDays(1))
-                .setEnd(LocalDateTime.now(APP_ZONE).plusDays(2)));
+                .setStart(LocalDateTime.now().plusDays(1))
+                .setEnd(LocalDateTime.now().plusDays(2)));
 
         assertThat(bookingService.getAllByUserId(booker.getId(), "WAITING"))
                 .extracting(BookingDto::getId)
@@ -104,7 +101,7 @@ class BookingServiceIntegrationTest {
                 .setName("Unavailable")
                 .setDescription("Unavailable item")
                 .setAvailable(false));
-        LocalDateTime start = LocalDateTime.now(APP_ZONE).plusHours(1);
+        LocalDateTime start = LocalDateTime.now().plusHours(1);
 
         assertThatThrownBy(() -> bookingService.create(booker.getId(), new BookingCreateDto()
                 .setItemId(item.getId())
@@ -128,7 +125,7 @@ class BookingServiceIntegrationTest {
         UserDto booker = createUser("booker-approval@example.com");
         UserDto stranger = createUser("stranger-approval@example.com");
         ItemDto item = createItem(owner.getId(), "Kayak");
-        LocalDateTime start = LocalDateTime.now(APP_ZONE).plusHours(1);
+        LocalDateTime start = LocalDateTime.now().plusHours(1);
         BookingDto booking = bookingService.create(booker.getId(), new BookingCreateDto()
                 .setItemId(item.getId())
                 .setStart(start)
@@ -152,7 +149,7 @@ class BookingServiceIntegrationTest {
         UserDto owner = createUser("owner-all-states@example.com");
         UserDto booker = createUser("booker-all-states@example.com");
         ItemDto item = createItem(owner.getId(), "Board");
-        LocalDateTime now = LocalDateTime.now(APP_ZONE);
+        LocalDateTime now = LocalDateTime.now();
         BookingDto past = bookingService.create(booker.getId(), new BookingCreateDto()
                 .setItemId(item.getId())
                 .setStart(now.minusDays(2))

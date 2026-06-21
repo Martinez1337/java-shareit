@@ -18,7 +18,6 @@ import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.List;
 import java.util.Locale;
 
@@ -26,8 +25,6 @@ import java.util.Locale;
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class BookingServiceImpl implements BookingService {
-    private static final ZoneId APP_ZONE = ZoneId.of(System.getenv().getOrDefault("TZ", "Europe/Moscow"));
-
     private final BookingRepository bookingRepository;
     private final ItemRepository itemRepository;
     private final UserRepository userRepository;
@@ -168,6 +165,6 @@ public class BookingServiceImpl implements BookingService {
     }
 
     private LocalDateTime now() {
-        return LocalDateTime.now(APP_ZONE);
+        return LocalDateTime.now();
     }
 }
