@@ -7,7 +7,7 @@ import lombok.ToString;
 import lombok.experimental.Accessors;
 import ru.practicum.shareit.user.model.User;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "requests")
@@ -25,7 +25,7 @@ public class ItemRequest {
     @JoinColumn(name = "requestor_id")
     User requestor;
 
-    Date created;
+    LocalDateTime created;
 
     @Override
     public boolean equals(Object o) {

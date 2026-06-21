@@ -29,7 +29,7 @@ public class Item {
     @JoinColumn(name = "owner_id")
     User owner;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "request_id")
     ItemRequest request;
 

@@ -1,19 +1,21 @@
 package ru.practicum.shareit.request.dto;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 import lombok.experimental.Accessors;
-import ru.practicum.shareit.user.model.User;
 
-import java.util.Date;
+import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @Accessors(chain = true)
 public class ItemRequestDto {
     Long id;
 
+    @NotBlank
     String description;
 
-    User requestor;
+    LocalDateTime created;
 
-    Date created;
+    List<ItemRequestResponseDto> items;
 }

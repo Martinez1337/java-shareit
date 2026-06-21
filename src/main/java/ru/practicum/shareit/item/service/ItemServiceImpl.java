@@ -18,6 +18,8 @@ import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.CommentRepository;
 import ru.practicum.shareit.item.repository.ItemRepository;
+import ru.practicum.shareit.request.model.ItemRequest;
+import ru.practicum.shareit.request.repository.ItemRequestRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
@@ -37,6 +39,7 @@ public class ItemServiceImpl implements ItemService {
     private final BookingRepository bookingRepository;
     private final CommentRepository commentRepository;
     private final UserRepository userRepository;
+    private final ItemRequestRepository itemRequestRepository;
     private final ItemMapper itemMapper;
     private final CommentMapper commentMapper;
 
@@ -46,6 +49,9 @@ public class ItemServiceImpl implements ItemService {
         User owner = getUser(userId);
         Item item = itemMapper.map(itemDto);
         item.setOwner(owner);
+        if (itemDto.getRequestId() != null) {
+            item.setRequest(getRequest(itemDto.getRequestId()));
+        }
         return itemMapper.mapToDto(itemRepository.save(item));
     }
 
@@ -145,6 +151,11 @@ public class ItemServiceImpl implements ItemService {
     private Item getItem(Long itemId) {
         return itemRepository.findById(itemId)
                 .orElseThrow(() -> new NotFoundException("Item not found: " + itemId));
+    }
+
+    private ItemRequest getRequest(Long requestId) {
+        return itemRequestRepository.findById(requestId)
+                .orElseThrow(() -> new NotFoundException("Item request not found: " + requestId));
     }
 
     private Map<Long, List<Booking>> getBookingsByItemId(List<Long> itemIds) {
