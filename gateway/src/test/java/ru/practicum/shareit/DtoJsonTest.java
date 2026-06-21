@@ -38,13 +38,9 @@ class DtoJsonTest {
         assertThat(bookingJson.write(dto)).extractingJsonPathStringValue("$.end")
                 .isEqualTo("2026-06-21T11:15:30");
 
-        BookingCreateDto parsed = bookingJson.parse("""
-                {
-                  "itemId": 10,
-                  "start": "2026-06-21T10:15:30",
-                  "end": "2026-06-21T11:15:30"
-                }
-                """).getObject();
+        BookingCreateDto parsed = bookingJson.parse(
+                "{\"itemId\":10,\"start\":\"2026-06-21T10:15:30\",\"end\":\"2026-06-21T11:15:30\"}"
+        ).getObject();
 
         assertThat(parsed.getItemId()).isEqualTo(10L);
         assertThat(parsed.getStart()).isEqualTo(dto.getStart());
