@@ -63,6 +63,20 @@ class ItemRequestServiceIntegrationTest {
                 .isInstanceOf(BadRequestException.class);
     }
 
+    @Test
+    void getAllShouldSupportDefaultPaginationAndRequestsWithoutResponses() {
+        UserDto requestor = createUser("requestor-empty@example.com");
+        UserDto viewer = createUser("viewer-empty@example.com");
+        ItemRequestDto request = itemRequestService.create(requestor.getId(), new ItemRequestDto()
+                .setDescription("Need empty response"));
+
+        assertThat(itemRequestService.getAll(viewer.getId(), null, null))
+                .extracting(ItemRequestDto::getId)
+                .contains(request.getId());
+        assertThat(itemRequestService.getById(viewer.getId(), request.getId()).getItems())
+                .isEmpty();
+    }
+
     private UserDto createUser(String email) {
         return userService.create(new UserDto()
                 .setName(email.substring(0, email.indexOf('@')))
