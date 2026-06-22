@@ -3,7 +3,6 @@ package ru.practicum.shareit.request.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.practicum.shareit.exception.BadRequestException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
@@ -100,17 +99,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     }
 
     private List<ItemRequest> getOtherUsersRequests(Long userId, Integer from, Integer size) {
-        if (from == null && size == null) {
-            return itemRequestRepository.findAllByRequestor_IdNotOrderByCreatedDesc(userId);
-        }
-
-        int actualFrom = from == null ? 0 : from;
-        int actualSize = size == null ? 20 : size;
-        if (actualFrom < 0 || actualSize <= 0) {
-            throw new BadRequestException("Invalid pagination parameters");
-        }
-
-        return itemRequestRepository.findAllByRequestorIdNot(userId, actualFrom, actualSize);
+        return itemRequestRepository.findAllByRequestorIdNot(userId, from, size);
     }
 
     private User getUser(Long userId) {

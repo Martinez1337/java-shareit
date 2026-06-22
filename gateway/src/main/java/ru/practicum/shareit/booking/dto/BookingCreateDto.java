@@ -1,21 +1,27 @@
 package ru.practicum.shareit.booking.dto;
 
+import jakarta.validation.constraints.Future;
+import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.experimental.Accessors;
-import ru.practicum.shareit.validation.ValidationGroups.Create;
+import ru.practicum.shareit.validation.annotation.ValidDateRange;
 
 import java.time.LocalDateTime;
 
 @Data
 @Accessors(chain = true)
+@ValidDateRange
 public class BookingCreateDto {
-    @NotNull(groups = Create.class)
+
+    @NotNull
+    @FutureOrPresent
     LocalDateTime start;
 
-    @NotNull(groups = Create.class)
+    @NotNull
+    @Future
     LocalDateTime end;
 
-    @NotNull(groups = Create.class)
+    @NotNull
     Long itemId;
 }

@@ -56,7 +56,7 @@ class BookingServiceIntegrationTest {
     }
 
     @Test
-    void createShouldRejectOwnerBookingOwnItemAndInvalidDates() {
+    void createShouldRejectOwnerBookingOwnItem() {
         UserDto owner = createUser("owner-invalid-booking@example.com");
         ItemDto item = createItem(owner.getId(), "Saw");
         LocalDateTime start = LocalDateTime.now().plusHours(2);
@@ -66,13 +66,6 @@ class BookingServiceIntegrationTest {
                 .setStart(start)
                 .setEnd(start.plusHours(1))))
                 .isInstanceOf(NotFoundException.class);
-
-        UserDto booker = createUser("booker-invalid-booking@example.com");
-        assertThatThrownBy(() -> bookingService.create(booker.getId(), new BookingCreateDto()
-                .setItemId(item.getId())
-                .setStart(start)
-                .setEnd(start)))
-                .isInstanceOf(BadRequestException.class);
     }
 
     @Test
@@ -94,7 +87,7 @@ class BookingServiceIntegrationTest {
     }
 
     @Test
-    void createShouldRejectUnavailableItemMissingItemAndNullDates() {
+    void createShouldRejectUnavailableAndMissingItem() {
         UserDto owner = createUser("owner-unavailable@example.com");
         UserDto booker = createUser("booker-unavailable@example.com");
         ItemDto item = itemService.create(owner.getId(), new ItemDto()
@@ -113,10 +106,6 @@ class BookingServiceIntegrationTest {
                 .setStart(start)
                 .setEnd(start.plusHours(1))))
                 .isInstanceOf(NotFoundException.class);
-        assertThatThrownBy(() -> bookingService.create(booker.getId(), new BookingCreateDto()
-                .setItemId(item.getId())
-                .setEnd(start.plusHours(1))))
-                .isInstanceOf(BadRequestException.class);
     }
 
     @Test
@@ -145,7 +134,7 @@ class BookingServiceIntegrationTest {
     }
 
     @Test
-    void getAllShouldSupportAllCurrentPastFutureRejectedAndBlankStates() {
+    void getAllShouldSupportAllCurrentPastFutureRejectedStates() {
         UserDto owner = createUser("owner-all-states@example.com");
         UserDto booker = createUser("booker-all-states@example.com");
         ItemDto item = createItem(owner.getId(), "Board");
@@ -171,10 +160,7 @@ class BookingServiceIntegrationTest {
                 .setEnd(now.plusDays(4)));
         bookingService.updateApproval(owner.getId(), rejected.getId(), false);
 
-        assertThat(bookingService.getAllByUserId(booker.getId(), null))
-                .extracting(BookingDto::getId)
-                .contains(past.getId(), current.getId(), future.getId(), rejected.getId());
-        assertThat(bookingService.getAllByUserId(booker.getId(), " "))
+        assertThat(bookingService.getAllByUserId(booker.getId(), "ALL"))
                 .extracting(BookingDto::getId)
                 .contains(past.getId(), current.getId(), future.getId(), rejected.getId());
         assertThat(bookingService.getAllByUserId(booker.getId(), "CURRENT"))
@@ -204,8 +190,6 @@ class BookingServiceIntegrationTest {
         assertThat(bookingService.getAllByOwnerId(owner.getId(), "REJECTED"))
                 .extracting(BookingDto::getId)
                 .contains(rejected.getId());
-        assertThatThrownBy(() -> bookingService.getAllByUserId(booker.getId(), "UNKNOWN"))
-                .isInstanceOf(BadRequestException.class);
     }
 
     private UserDto createUser(String email) {

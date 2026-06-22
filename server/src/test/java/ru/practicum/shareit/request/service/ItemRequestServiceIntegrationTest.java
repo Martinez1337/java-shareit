@@ -4,7 +4,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
-import ru.practicum.shareit.exception.BadRequestException;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
@@ -15,7 +14,6 @@ import ru.practicum.shareit.user.service.UserService;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @SpringBootTest
 @Transactional
@@ -54,23 +52,13 @@ class ItemRequestServiceIntegrationTest {
     }
 
     @Test
-    void getAllShouldRejectInvalidPagination() {
-        UserDto user = createUser("bad-page@example.com");
-
-        assertThatThrownBy(() -> itemRequestService.getAll(user.getId(), -1, 20))
-                .isInstanceOf(BadRequestException.class);
-        assertThatThrownBy(() -> itemRequestService.getAll(user.getId(), 0, 0))
-                .isInstanceOf(BadRequestException.class);
-    }
-
-    @Test
-    void getAllShouldSupportDefaultPaginationAndRequestsWithoutResponses() {
+    void getAllShouldReturnRequestsWithoutResponses() {
         UserDto requestor = createUser("requestor-empty@example.com");
         UserDto viewer = createUser("viewer-empty@example.com");
         ItemRequestDto request = itemRequestService.create(requestor.getId(), new ItemRequestDto()
                 .setDescription("Need empty response"));
 
-        assertThat(itemRequestService.getAll(viewer.getId(), null, null))
+        assertThat(itemRequestService.getAll(viewer.getId(), 0, 20))
                 .extracting(ItemRequestDto::getId)
                 .contains(request.getId());
         assertThat(itemRequestService.getById(viewer.getId(), request.getId()).getItems())

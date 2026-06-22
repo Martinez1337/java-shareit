@@ -18,6 +18,9 @@ import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.validation.ValidationGroups.Create;
 import ru.practicum.shareit.validation.ValidationGroups.Update;
 
+import java.util.List;
+
+
 @RestController
 @RequestMapping("/items")
 @RequiredArgsConstructor
@@ -59,6 +62,10 @@ public class ItemController {
 
     @GetMapping("/search")
     public ResponseEntity<Object> search(@RequestParam String text) {
+        if (text == null || text.isBlank()) {
+            return ResponseEntity.ok(List.of());
+        }
+
         return itemClient.search(text);
     }
 

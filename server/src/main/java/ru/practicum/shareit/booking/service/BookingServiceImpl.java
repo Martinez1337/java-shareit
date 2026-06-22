@@ -34,7 +34,6 @@ public class BookingServiceImpl implements BookingService {
     @Transactional
     public BookingDto create(Long userId, BookingCreateDto bookingCreateDto) {
         User booker = getUser(userId);
-        validateBookingDates(bookingCreateDto);
 
         Item item = getItem(bookingCreateDto.getItemId());
         if (!Boolean.TRUE.equals(item.getAvailable())) {
@@ -85,7 +84,7 @@ public class BookingServiceImpl implements BookingService {
     public List<BookingDto> getAllByUserId(Long userId, String state) {
         getUser(userId);
         BookingState bookingState = parseState(state);
-        LocalDateTime now = now();
+        LocalDateTime now = LocalDateTime.now();
 
         List<Booking> bookings = switch (bookingState) {
             case ALL -> bookingRepository.findAllByBooker_IdOrderByStartDesc(userId);
@@ -109,7 +108,7 @@ public class BookingServiceImpl implements BookingService {
     public List<BookingDto> getAllByOwnerId(Long userId, String state) {
         getUser(userId);
         BookingState bookingState = parseState(state);
-        LocalDateTime now = now();
+        LocalDateTime now = LocalDateTime.now();
 
         List<Booking> bookings = switch (bookingState) {
             case ALL -> bookingRepository.findAllByOwnerId(userId);
@@ -145,26 +144,6 @@ public class BookingServiceImpl implements BookingService {
     }
 
     private BookingState parseState(String state) {
-        if (state == null || state.isBlank()) {
-            return BookingState.ALL;
-        }
-        try {
-            return BookingState.valueOf(state.trim().toUpperCase(Locale.ROOT));
-        } catch (IllegalArgumentException exception) {
-            throw new BadRequestException("Unknown state: " + state);
-        }
-    }
-
-    private void validateBookingDates(BookingCreateDto bookingCreateDto) {
-        if (bookingCreateDto.getStart() == null || bookingCreateDto.getEnd() == null) {
-            throw new BadRequestException("Booking start and end dates are required");
-        }
-        if (!bookingCreateDto.getEnd().isAfter(bookingCreateDto.getStart())) {
-            throw new BadRequestException("Booking end date must be after start date");
-        }
-    }
-
-    private LocalDateTime now() {
-        return LocalDateTime.now();
+        return BookingState.valueOf(state.trim().toUpperCase(Locale.ROOT));
     }
 }
